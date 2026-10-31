@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List App</title>
+    <style>
+        /* CSS Reset & General Styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* App Container */
+        .todo-app {
+            background: #ffffff;
+            width: 100%;
+            max-width: 450px;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .todo-app h2 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 26px;
+        }
+
+        /* Input Section */
+        .input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .input-container input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .input-container input:focus {
+            border-color: #667eea;
+        }
+
+        .input-container button {
+            padding: 12px 20px;
+            background-color: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px;
+            transition: background 0.3s;
+        }
+
+        .input-container button:hover {
+            background-color: #5a67d8;
+        }
+
+        /* List Items Styling */
+        .todo-list {
+            list-style: none;
+            max-height: 350px;
+            overflow-y: auto;
+        }
+
+        .todo-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8f9fa;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .todo-item.completed {
+            opacity: 0.6;
+        }
+
+        .todo-item.completed .task-text {
+            text-decoration: line-through;
+            color: #888;
+        }
+
+        .task-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .task-content input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #48bb78;
+        }
+
+        .task-text {
+            font-size: 16px;
+            color: #333;
+            word-break: break-word;
+        }
+
+        /* Action Buttons */
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 6px 10px;
+            border-radius: 5px;
+            transition: background 0.2s;
+        }
+
+        .edit-btn {
+            background-color: #feebc8;
+            color: #dd6b20;
+        }
+
+        .edit-btn:hover {
+            background-color: #fbd38d;
+        }
+
+        .delete-btn {
+            background-color: #fed7d7;
+            color: #e53e3e;
+        }
+
+        .delete-btn:hover {
+            background-color: #feb2b2;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="todo-app">
+        <h2>My To-Do List</h2>
+        
+        <div class="input-container">
+            <input type="text" id="todoInput" placeholder="Add a new task...">
+            <button onclick="addTask()">Add</button>
+        </div>
+
+        <ul class="todo-list" id="todoList">
+            </ul>
+    </div>
+
+    <script>
+        const todoInput = document.getElementById('todoInput');
+        const todoList = document.getElementById('todoList');
+
+        // Add Task Function
+        function addTask() {
+            const taskText = todoInput.value.trim();
+
+            if (taskText === '') {
+                alert('Please enter a task first!');
+                return;
+            }
+
+            // Create li element
+            const li = document.createElement('li');
+            li.className = 'todo-item';
+
+            li.innerHTML = `
+                <div class="task-content">
+                    <input type="checkbox" onchange="toggleCheck(this)">
+                    <span class="task-text">${taskText}</span>
+                </div>
+                <div class="actions">
+                    <button class="btn edit-btn" onclick="editTask(this)">Edit</button>
+                    <button class="btn delete-btn" onclick="deleteTask(this)">Delete</button>
+                </div>
+            `;
+
+            todoList.appendChild(li);
+            todoInput.value = '';
+        }
+
+        // Add task on pressing Enter key
+        todoInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addTask();
+            }
+        });
+
+        // Toggle Complete Function
+        function toggleCheck(checkbox) {
+            const todoItem = checkbox.closest('.todo-item');
+            if (checkbox.checked) {
+                todoItem.classList.add('completed');
+            } else {
+                todoItem.classList.remove('completed');
+            }
+        }
+
+        // Edit Task Function
+        function editTask(button) {
+            const todoItem = button.closest('.todo-item');
+            const taskSpan = todoItem.querySelector('.task-text');
+            const currentText = taskSpan.innerText;
+
+            const newText = prompt('Update your task:', currentText);
+
+            if (newText !== null && newText.trim() !== '') {
+                taskSpan.innerText = newText.trim();
+            }
+        }
+
+        // Delete Task Function
+        function deleteTask(button) {
+            const todoItem = button.closest('.todo-item');
+            todoItem.remove();
+        }
+    </script>
+</body>
+</html>
